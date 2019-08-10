@@ -2,3 +2,5 @@
 /logs
 /data
 download.py
+__pycache__/
+/.idea
