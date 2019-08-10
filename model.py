@@ -12,7 +12,7 @@ class DCGAN(object):
                  batch_size=64, sample_num=64, output_depth=8, output_height=64, output_width=64,
                  z_dim=100, gf_dim=64, df_dim=64, kernel_size=3, gfc_dim=1024, dfc_dim=1024,
                  c_dim=3, dataset_name='default', data_type='complete', mode=None,
-                 input_fname_pattern='*.jpg', checkpoint_dir=None, training=True):
+                 checkpoint_dir=None, training=True):
         self.sess = sess
         self.is_crop = is_crop
         self.is_grayscale = (c_dim == 1)
@@ -40,7 +40,6 @@ class DCGAN(object):
         self.dataset_name = dataset_name
         self.data_type = data_type
         self.mode = mode
-        self.input_fname_pattern = input_fname_pattern
         self.checkpoint_dir = checkpoint_dir
 
         self.training = training
@@ -107,10 +106,7 @@ class DCGAN(object):
         self.saver = tf.train.Saver()
 
     def train(self, config):
-        if config.dataset == 'taxibj' or config.dataset == 'taxibj_v2' or config.dataset == 'taxibj_v3':
-            data = self.load_taxibj()
-        else:
-            data = glob(os.path.join('./data', config.dataset, self.input_fname_pattern))
+        data = self.load_taxibj()
 
         d_optim = tf.train.AdamOptimizer(config.learning_rate, beta1=0.5) \
             .minimize(self.d_loss, var_list=self.d_vars)
@@ -134,32 +130,10 @@ class DCGAN(object):
             print(" [!] Load failed...")
 
         for epoch in range(config.epoch):
-            if config.dataset == 'taxibj' \
-                    or config.dataset == 'taxibj_v2' or config.dataset == 'taxibj_v3':
-                batch_idxs = min(len(data), config.train_size) // config.batch_size
-            else:
-                data = glob(os.path.join(
-                    "./data", config.dataset, self.input_fname_pattern))
-                batch_idxs = min(len(data), config.train_size) // config.batch_size
+            batch_idxs = min(len(data), config.train_size) // config.batch_size
 
             for idx in range(batch_idxs):
-                if config.dataset == 'taxibj' \
-                        or config.dataset == 'taxibj_v2' or config.dataset == 'taxibj_v3':
-                    batch_images = data[idx * config.batch_size:(idx + 1) * config.batch_size]
-                else:
-                    batch_files = data[idx * config.batch_size:(idx + 1) * config.batch_size]
-                    batch = [
-                        get_image(batch_file,
-                                  input_height=self.input_height,
-                                  input_width=self.input_width,
-                                  resize_height=self.output_height,
-                                  resize_width=self.output_width,
-                                  is_crop=self.is_crop,
-                                  is_grayscale=self.is_grayscale) for batch_file in batch_files]
-                    if self.is_grayscale:
-                        batch_images = np.array(batch).astype(np.float32)[:, :, :, None]
-                    else:
-                        batch_images = np.array(batch).astype(np.float32)
+                batch_images = data[idx * config.batch_size:(idx + 1) * config.batch_size]
 
                 batch_z = np.random.uniform(-1, 1, [config.batch_size, self.z_dim]).astype(np.float32)
 
@@ -186,11 +160,11 @@ class DCGAN(object):
             if np.mod(epoch, 10) == 9:
                 try:
                     samples = self.sess.run(self.sampler, feed_dict={self.z: sample_z})
-                    if config.dataset == 'taxibj' or config.dataset == 'taxibj_v2' or config.dataset == 'taxibj_v3':
-                        if self.mode == '3d':
-                            samples = np.expand_dims(samples[:, 0, :, :, 0], axis=3)
-                        else:
-                            samples = np.expand_dims(samples[:, :, :, 0], axis=3)
+
+                    if self.mode == '3d':
+                        samples = np.expand_dims(samples[:, 0, :, :, 0], axis=3)
+                    else:
+                        samples = np.expand_dims(samples[:, :, :, 0], axis=3)
                     save_images(samples, [8, 8],
                                 './{}/train_{:02d}.png'.format(config.sample_dir, 4))
                     print('one pic is saved...')
@@ -530,8 +504,8 @@ class DCGAN(object):
                     result = y[0, :, :, 0] * (1 - mask) + sample_x[:, :, 0] * mask
                 results = np.append(results, result, axis=0)
 
-        # plt.plot(loss_sum)
-        # plt.show()
+        plt.plot(loss_sum)
+        plt.show()
         results = results.reshape((-1, 32, 32, 1))
         save_images(results, [3, 4], './{}/result_{:02d}.png'.format('./samples', 2000))
 
