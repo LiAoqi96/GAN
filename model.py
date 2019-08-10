@@ -1,21 +1,18 @@
 import os
 import time
 import math
-from glob import glob
 from ops import *
 from utils import *
 import matplotlib.pyplot as plt
 
 
 class DCGAN(object):
-    def __init__(self, sess, input_depth=8, input_height=96, input_width=96, is_crop=True,
+    def __init__(self, sess, input_depth=8, input_height=96, input_width=96,
                  batch_size=64, sample_num=64, output_depth=8, output_height=64, output_width=64,
                  z_dim=100, gf_dim=64, df_dim=64, kernel_size=3, gfc_dim=1024, dfc_dim=1024,
                  c_dim=3, dataset_name='default', data_type='complete', mode=None,
                  checkpoint_dir=None, training=True):
         self.sess = sess
-        self.is_crop = is_crop
-        self.is_grayscale = (c_dim == 1)
 
         self.batch_size = batch_size
         self.sample_num = sample_num
@@ -60,10 +57,7 @@ class DCGAN(object):
         if self.mode == '3d':
             image_dim = [self.input_depth, self.input_height, self.input_width, self.c_dim]
         else:
-            if self.is_crop:
-                image_dim = [self.output_height, self.output_width, self.c_dim]
-            else:
-                image_dim = [self.input_height, self.input_width, self.c_dim]
+            image_dim = [self.input_height, self.input_width, self.c_dim]
 
         self.inputs = tf.placeholder(tf.float32, [self.batch_size] + image_dim, 'real_images')
 

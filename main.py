@@ -26,7 +26,6 @@ flags.DEFINE_string('mode', '3d', 'The mode of convolution')
 flags.DEFINE_string("checkpoint_dir", "checkpoint", "Directory name to save the checkpoints [checkpoint]")
 flags.DEFINE_string("sample_dir", "samples", "Directory name to save the data samples [samples]")
 flags.DEFINE_boolean("is_train", False, "True for training, False for testing [False]")
-flags.DEFINE_boolean("is_crop", False, "True for training, False for testing [False]")
 FLAGS = flags.FLAGS
 
 
@@ -58,7 +57,6 @@ def main(_):
             dataset_name=FLAGS.dataset,
             data_type=FLAGS.data_type,
             mode=FLAGS.mode,
-            is_crop=FLAGS.is_crop,
             checkpoint_dir=FLAGS.checkpoint_dir,
             training=FLAGS.is_train)
 

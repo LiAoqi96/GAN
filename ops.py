@@ -7,10 +7,6 @@ merge_summary = tf.summary.merge
 SummaryWriter = tf.summary.FileWriter
 
 
-def concat(tensors, axis, *args, **kwargs):
-    return tf.concat(tensors, axis, *args, **kwargs)
-
-
 class batch_norm(object):
     def __init__(self, epsilon=1e-5, momentum=0.9, name="batch_norm", train=True):
         with tf.variable_scope(name):
@@ -27,14 +23,6 @@ class batch_norm(object):
                                             scale=True,
                                             is_training=self.train,
                                             scope=self.name)
-
-
-def conv_cond_concat(x, y):
-    """Concatenate conditioning vector on feature map axis."""
-    x_shapes = x.get_shape()
-    y_shapes = y.get_shape()
-    return concat([
-        x, y * tf.ones([x_shapes[0], x_shapes[1], x_shapes[2], y_shapes[3]])], 3)
 
 
 def conv2d(input_, output_dim,
