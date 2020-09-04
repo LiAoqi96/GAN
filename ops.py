@@ -39,6 +39,7 @@ def conv2d(input_, output_dim,
         return conv
 
 
+
 def conv3d(input_, output_dim, k_d=3,
            k_h=5, k_w=5, d_d=1, d_h=2, d_w=2, stddev=0.02,
            name="conv3d"):

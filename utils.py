@@ -69,6 +69,7 @@ def transform(image, input_height, input_width,
     return np.array(cropped_image) / 127.5 - 1.
 
 
+
 def inverse_transform(images):
     return (images + 1.) / 2.
 

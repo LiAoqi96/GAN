@@ -72,5 +72,6 @@ def main(_):
         # visualize(sess, dcgan, FLAGS, option=1)
 
 
+
 if __name__ == '__main__':
     tf.app.run()
