@@ -534,6 +534,6 @@ def generate_mask(length, radio=0.5):
     return mask
 
 
-def compute_rmse(result, x, mask):
+def compute_rmse(result, x):
     RMSE = np.sqrt(np.mean((np.uint16((result + 1.) * 646.) - np.uint16((x + 1.) * 646.)) ** 2))
     return RMSE
